@@ -1,0 +1,6 @@
+#ifndef GRAPHWIDGET_HPP
+#define GRAPHWIDGET_HPP
+
+
+
+#endif // GRAPHWIDGET_HPP
