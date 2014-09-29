@@ -25,7 +25,7 @@ rock_vizkit_widget(Pose3dEditor
     SOURCES ${SRCS} ${QtApp_RCC_SRCS}
     HEADERS ${HDRS}
     MOC ${MOC_HDRS}
-    DEPS_PKGCONFIG QtCore QtGui
+    DEPS_PKGCONFIG QtCore QtGui QtOpenGL
     UI ${UI_FILES}
     DEPS modifiable_scene
 )
