@@ -33,6 +33,6 @@ void Manipulatable::set_transform(osg::Matrix transform){
 }
 
 osg::Matrix Manipulatable::get_transform(){
-    _transform->getMatrix();
+    return _transform->getMatrix();
 }
 }
