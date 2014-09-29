@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Pose3dEditorVizkit.hpp"
+#include <osg/io_utils>
 
 using namespace vizkit3d;
 
@@ -15,6 +16,8 @@ Pose3dEditorVizkit::Pose3dEditorVizkit()
     : p(new Data), _modelFile(""), _frameName(""), _modelScale(1.0)
 {
     _scene = new modifiable_scene::Scene();
+    p->data.position=Eigen::Vector3d(0,0,0);
+    p->data.orientation=Eigen::Quaterniond(1,0,0,0);
 }
 
 Pose3dEditorVizkit::~Pose3dEditorVizkit()
@@ -38,10 +41,120 @@ void Pose3dEditorVizkit::setModelScale(double const scale){
     _modelScale=scale;
 }
 
+QVector3D Pose3dEditorVizkit::position() const {
+    if(_scene->get_transforms().size()){
+        osg::Vec3d q=_scene->get_transforms()[0].second.getTrans();
+
+        std::clog << "5: "<<q<<std::endl;
+        QVector3D ret = to_qt(_scene->get_transforms()[0].second.getTrans());
+        std::clog << "6: "<<ret.x()<<std::endl;
+        return ret;
+    }
+    else
+        return QVector3D();
+}
+
+void Pose3dEditorVizkit::setPosition(QVector3D const &vect){
+    p->data.position = to_eigen(vect);
+    updateData(p->data);
+}
+
+QQuaternion Pose3dEditorVizkit::orientation() const {
+    if(_scene->get_transforms().size())
+        return to_qt(_scene->get_transforms()[0].second.getRotate());
+    else
+        return QQuaternion();
+}
+
+void Pose3dEditorVizkit::setOrientation(QQuaternion const &quat){
+    p->data.orientation = to_eigen(quat);
+    updateData(p->data);
+}
+
+double Pose3dEditorVizkit::x(){
+    if(_scene->get_transforms().size()){
+        return _scene->get_transforms()[0].second.getTrans().x();
+    }
+    else
+        return 0;
+}
+double Pose3dEditorVizkit::y(){
+    if(_scene->get_transforms().size())
+        return _scene->get_transforms()[0].second.getTrans().y();
+    else
+        return 0;
+}
+double Pose3dEditorVizkit::z(){
+    if(_scene->get_transforms().size())
+        return _scene->get_transforms()[0].second.getTrans().z();
+    else
+        return 0;
+}
+double Pose3dEditorVizkit::qx(){
+    if(_scene->get_transforms().size())
+        return _scene->get_transforms()[0].second.getRotate().x();
+    else
+        return 0;
+}
+double Pose3dEditorVizkit::qy(){
+    if(_scene->get_transforms().size())
+        return _scene->get_transforms()[0].second.getRotate().y();
+    else
+        return 0;
+}
+double Pose3dEditorVizkit::qz(){
+    if(_scene->get_transforms().size())
+        return _scene->get_transforms()[0].second.getRotate().z();
+    else
+        return 0;
+}
+double Pose3dEditorVizkit::qw(){
+    if(_scene->get_transforms().size())
+        return _scene->get_transforms()[0].second.getRotate().w();
+    else
+        return 0;
+}
+void Pose3dEditorVizkit::syncPose(){
+    if(_scene->get_transforms().size()){
+        p->data.position = to_eigen(_scene->get_transforms()[0].second.getTrans());
+        p->data.orientation = to_eigen(_scene->get_transforms()[0].second.getRotate());
+    }
+}
+
+void Pose3dEditorVizkit::setX(double const &val){
+    p->data.position.x() = val;
+    updateData(p->data);
+}
+void Pose3dEditorVizkit::setY(double const &val){
+     p->data.position.y() = val;
+    updateData(p->data);
+}
+void Pose3dEditorVizkit::setZ(double const &val){
+     p->data.position.z() = val;
+    updateData(p->data);
+}
+void Pose3dEditorVizkit::setQx(double const &val){
+     p->data.orientation.x() = val;
+    updateData(p->data);
+}
+void Pose3dEditorVizkit::setQy(double const &val){
+    p->data.orientation.y() = val;
+    updateData(p->data);
+}
+void Pose3dEditorVizkit::setQz(double const &val){
+    p->data.orientation.z() = val;
+    updateData(p->data);
+}
+void Pose3dEditorVizkit::setQw(double const &val){
+    p->data.orientation.w() = val;
+    updateData(p->data);
+}
+
 
 void Pose3dEditorVizkit::setModelFile(QString file_name)
 {
     if(_modelFile!=""){
+        std::cerr << "a model file was already set"<<std::endl;
         throw("a model file was already set");
     }
     _modelFile = file_name;
@@ -52,9 +165,11 @@ void Pose3dEditorVizkit::setModelFile(QString file_name)
 void Pose3dEditorVizkit::setFrameName(QString frame_name)
 {
     if(_frameName!=""){
+        std::cerr << "a frame name was already set"<<std::endl;
         throw("a frame name was already set");
     }
     _frameName = frame_name;
+    p->data.sourceFrame = _frameName.toLatin1().data();
 
     addMovable(_frameName, _modelFile, _modelScale);
 }
@@ -85,11 +200,14 @@ void Pose3dEditorVizkit::updateMainNode ( osg::Node* node )
      transform.setTrans(p->data.position.x(), p->data.position.y(), p->data.position.z());
      transform.setRotate(osg::Quat(p->data.orientation.x(), p->data.orientation.y(), p->data.orientation.z(), p->data.orientation.w()));
      _scene->manipulatable(p->data.sourceFrame)->set_transform(transform);
+     std::cout << "Update: " << p->data.position.x()<<std::endl;
 }
 
 void Pose3dEditorVizkit::updateDataIntern( base::samples::RigidBodyState const& value)
 {
     p->data = value;
+    std::cout << "Update intern: " << p->data.position.x()<<","<<value.position.x()<<std::endl;
+    emit childrenChanged();
 }
 
 //Macro that makes this plugin loadable in ruby, this is optional.
