@@ -15,6 +15,7 @@ void SceneItem::attach_scene(osg::ref_ptr<osg::Node> scene){
 }
 
 void SceneItem::attach_urdf(std::string filepath, std::string root){
+    std::cerr << "Not implemented" << std::endl;
     throw("Not implemented");
 }
 }

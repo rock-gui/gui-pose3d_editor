@@ -31,6 +31,7 @@ osg::ref_ptr<Manipulatable> Scene::manipulatable(std::string name){
             return _manipulatables[i].second;
         }
     }
+    std::cerr << "Did not find '"<<name<<"'"<<std::endl;
     throw "Not found";
 }
 
