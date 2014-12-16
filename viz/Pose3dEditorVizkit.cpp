@@ -44,14 +44,32 @@ void Pose3dEditorVizkit::setModelScale(double const scale){
 QVector3D Pose3dEditorVizkit::position() const {
     if(_scene->get_transforms().size()){
         osg::Vec3d q=_scene->get_transforms()[0].second.getTrans();
-
-        std::clog << "5: "<<q<<std::endl;
         QVector3D ret = to_qt(_scene->get_transforms()[0].second.getTrans());
-        std::clog << "6: "<<ret.x()<<std::endl;
         return ret;
     }
     else
         return QVector3D();
+}
+
+base::samples::RigidBodyState Pose3dEditorVizkit::rbs() const {
+    base::samples::RigidBodyState ret;
+
+    if(_scene->get_transforms().size()){
+        QVector3D p=position();
+        QQuaternion q = orientation();
+        ret.position.x() = p.x();
+        ret.position.y() = p.y();
+        ret.position.z() = p.z();
+
+        ret.orientation.x() = q.x();
+        ret.orientation.y() = q.y();
+        ret.orientation.z() = q.z();
+        ret.orientation.w() = q.scalar();
+
+        return ret;
+    }
+    else
+        return ret;
 }
 
 void Pose3dEditorVizkit::setPosition(QVector3D const &vect){

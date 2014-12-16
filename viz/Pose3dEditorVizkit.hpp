@@ -64,6 +64,7 @@ public slots:
     void setPosition(QVector3D const &vect);
     QQuaternion orientation() const;
     void setOrientation(QQuaternion const &quat);
+    base::samples::RigidBodyState rbs() const;
 
 
 
