@@ -65,11 +65,17 @@ base::samples::RigidBodyState Pose3dEditorVizkit::rbs() const {
         ret.orientation.y() = q.y();
         ret.orientation.z() = q.z();
         ret.orientation.w() = q.scalar();
+        ret.sourceFrame = frameName().toLatin1().data();
 
         return ret;
     }
     else
         return ret;
+}
+
+void Pose3dEditorVizkit::setRbs(const base::samples::RigidBodyState &rbs){
+    p->data = rbs;
+    updateData(p->data);
 }
 
 void Pose3dEditorVizkit::setPosition(QVector3D const &vect){
@@ -217,7 +223,13 @@ void Pose3dEditorVizkit::updateMainNode ( osg::Node* node )
      osg::Matrix transform;
      transform.setTrans(p->data.position.x(), p->data.position.y(), p->data.position.z());
      transform.setRotate(osg::Quat(p->data.orientation.x(), p->data.orientation.y(), p->data.orientation.z(), p->data.orientation.w()));
-     _scene->manipulatable(p->data.sourceFrame)->set_transform(transform);
+     osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toLatin1().data());
+     if(!manipulatable){
+         std::stringstream ss;
+         ss << "No manipulatable with name '" << p->data.sourceFrame << "' was found.";
+         throw(std::runtime_error(ss.str()));
+     }
+     manipulatable->set_transform(transform);
      std::cout << "Update: " << p->data.position.x()<<std::endl;
 }
 

@@ -65,6 +65,7 @@ public slots:
     QQuaternion orientation() const;
     void setOrientation(QQuaternion const &quat);
     base::samples::RigidBodyState rbs() const;
+    void setRbs(base::samples::RigidBodyState const &rbs);
 
 
 
