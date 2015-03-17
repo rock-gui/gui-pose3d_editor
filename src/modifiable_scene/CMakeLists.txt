@@ -17,5 +17,5 @@ INCLUDE_DIRECTORIES(${OPENSCENEGRAPH_INCLUDE_DIRS})
 
 add_library( modifiable_scene scene.h scene.cpp sceneitem.h sceneitem.cpp manipulatable.h manipulatable.cpp dragger.h dragger.cpp)
 TARGET_LINK_LIBRARIES( modifiable_scene ${OPENSCENEGRAPH_LIBRARIES} ${OSGQT_LIBRARIES})
-install (FILES scene.h sceneitem.h manipulatable.h dragger.h colorvisitor.hpp DESTINATION include/${PROJECT_NAME}/modifiable_scene)
+install (FILES scene.h sceneitem.h manipulatable.h dragger.h DESTINATION include/${PROJECT_NAME}/modifiable_scene)
 

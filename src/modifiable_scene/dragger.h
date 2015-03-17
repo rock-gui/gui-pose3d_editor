@@ -4,7 +4,6 @@
 #include <osgManipulator/Dragger>
 #include <osgManipulator/TrackballDragger>
 #include <osgManipulator/Translate2DDragger>
-#include "colorvisitor.hpp"
 
 namespace modifiable_scene{
 
