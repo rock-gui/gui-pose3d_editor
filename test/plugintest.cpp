@@ -1,7 +1,7 @@
 #include <QtCore>
 #include <iostream>
 #include <QApplication>
-#include "pose3d_editor/Pose3dEditor.hpp"
+#include "../src/Pose3dEditor.hpp"
 
 int main(int argc, char** argv)
 {
