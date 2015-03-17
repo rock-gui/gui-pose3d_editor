@@ -43,7 +43,6 @@ void Pose3dEditorVizkit::setModelScale(double const scale){
 
 QVector3D Pose3dEditorVizkit::position() const {
     if(_scene->get_transforms().size()){
-        osg::Vec3d q=_scene->get_transforms()[0].second.getTrans();
         QVector3D ret = to_qt(_scene->get_transforms()[0].second.getTrans());
         return ret;
     }
