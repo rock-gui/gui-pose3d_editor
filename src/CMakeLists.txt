@@ -21,7 +21,7 @@ FILE(GLOB UI_FILES
 
 SET(QtApp_RCCS resources.qrc)
 
-rock_vizkit_widget(Pose3dEditor
+rock_vizkit_widget(pose3d_editor
     SOURCES ${SRCS} ${QtApp_RCC_SRCS}
     HEADERS ${HDRS}
     MOC ${MOC_HDRS}
