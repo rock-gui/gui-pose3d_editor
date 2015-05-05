@@ -7,12 +7,31 @@
 namespace modifiable_scene{
 Scene::Scene()
 {
-    osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3d(0,0,0), 0.1));
+    set_root_scene(default_root_scene());
+}
+
+osg::ref_ptr<osg::Group> Scene::empty_scene()
+{
+    return osg::ref_ptr<osg::Group>(new osg::Group);
+}
+
+osg::ref_ptr<osg::Group> Scene::default_root_scene()
+{
+    osg::ref_ptr<osg::ShapeDrawable> drawable = osg::ref_ptr<osg::ShapeDrawable>(new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), 0.1)));
     drawable->setColor(osg::Vec4(0.5f, 1.5f, 0.7f, 0.5f));
 
-    osg::Geode* g = new osg::Geode();
-    g->addDrawable(drawable);
-    this->addChild(g);
+    osg::ref_ptr<osg::Geode> geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
+    geode->addDrawable(drawable);
+
+    osg::ref_ptr<osg::Group> g = empty_scene();
+    g->addChild(geode);
+    return g;
+}
+
+void Scene::set_root_scene(osg::ref_ptr<osg::Group> root_scene){
+    this->removeChild(_root_scene);
+    _root_scene.swap(root_scene);
+    this->addChild(_root_scene);
 }
 
 std::vector<std::pair<std::string, osg::Matrix> > Scene::get_transforms(){
@@ -39,20 +58,21 @@ osg::Matrix Scene::get_transform(std::string name){
     return manipulatable(name)->get_transform();
 }
 
-void Scene::add_movable(std::string name, osg::ref_ptr<osg::Node> scene){
+void Scene::add_movable(std::string name, osg::ref_ptr<osg::Node> scene, Manipulatable::Config config){
 
-    osg::ref_ptr<Manipulatable> ptr = new Manipulatable(scene);
+    osg::ref_ptr<Manipulatable> ptr = new Manipulatable(scene, config, this);
+
     _manipulatables.push_back(std::make_pair(name, ptr));
     this->addChild(ptr.get());
 }
 
-void Scene::add_movable_from_mesh_file(std::string name, std::string filepath, double scale)
+void Scene::add_movable_from_mesh_file(std::string name, std::string filepath, double scale, Manipulatable::Config config)
 {
     osg::ref_ptr<osg::Node> loadedModel = osgDB::readNodeFile(filepath);
     osg::PositionAttitudeTransform* transform = new osg::PositionAttitudeTransform();
     transform->setScale(osg::Vec3f(scale, scale, scale));
     transform->addChild(loadedModel);
-    add_movable(name, transform);
+    add_movable(name, transform, config);
 }
 
 }

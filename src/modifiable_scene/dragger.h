@@ -13,7 +13,7 @@ class DualPlaneDragger: public osgManipulator::CompositeDragger
         osg::ref_ptr<osgManipulator::Translate2DDragger> _plane_dragger1;
         osg::ref_ptr<osgManipulator::Translate2DDragger> _plane_dragger2;
 
-        DualPlaneDragger();
+        DualPlaneDragger(osg::Matrixd world_coords);
         ~DualPlaneDragger();
 
         void setupDefaultGeometry();
@@ -32,7 +32,7 @@ class Dragger : public osgManipulator::CompositeDragger
 public:
     osg::ref_ptr<TrackballDragger> _orientation_dragger;
     osg::ref_ptr<DualPlaneDragger> _position_dragger;
-    Dragger();
+    Dragger(osg::Matrixd world_coords);
 
     ~Dragger();
 
