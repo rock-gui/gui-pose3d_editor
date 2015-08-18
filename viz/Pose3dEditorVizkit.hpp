@@ -70,6 +70,7 @@ public slots:
 
 
     Q_INVOKABLE void addMovable(QString const name, QString const model_file, double scale=1.0f);
+    Q_INVOKABLE void removeMovable(QString name);
 
     Q_INVOKABLE void updateData( base::samples::RigidBodyState const &sample)
     {vizkit3d::Vizkit3DPlugin<base::samples::RigidBodyState>::updateData(sample);}

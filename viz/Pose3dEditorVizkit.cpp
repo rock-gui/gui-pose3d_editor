@@ -64,7 +64,7 @@ base::samples::RigidBodyState Pose3dEditorVizkit::rbs() const {
         ret.orientation.y() = q.y();
         ret.orientation.z() = q.z();
         ret.orientation.w() = q.scalar();
-        ret.sourceFrame = frameName().toLatin1().data();
+        ret.sourceFrame = frameName().toStdString();
 
         return ret;
     }
@@ -192,7 +192,7 @@ void Pose3dEditorVizkit::setFrameName(QString frame_name)
         throw("a frame name was already set");
     }
     _frameName = frame_name;
-    p->data.sourceFrame = _frameName.toLatin1().data();
+    p->data.sourceFrame = _frameName.toStdString();
 
     addMovable(_frameName, _modelFile, _modelScale);
 }
@@ -201,12 +201,18 @@ void Pose3dEditorVizkit::setFrameName(QString frame_name)
 void Pose3dEditorVizkit::addMovable(QString name, QString model_file, double scale)
 {
     if(_frameName!="" && _modelFile!=""){
-        std::cout << "adding"<<std::endl;
-        _scene->add_movable_from_mesh_file(name.toLatin1().data(), model_file.toLatin1().data(), scale);
+        std::cout << "adding " << name.toStdString() <<std::endl;
+        _scene->add_movable_from_mesh_file(name.toStdString(), model_file.toStdString(), scale);
         emit childrenChanged();
         std::cout << "added"<<std::endl;
     }
 }
+
+void Pose3dEditorVizkit::removeMovable(QString name) 
+{
+    _scene->remove_movable(name.toStdString());
+}
+
 
 osg::ref_ptr<osg::Node> Pose3dEditorVizkit::createMainNode()
 {
@@ -222,7 +228,7 @@ void Pose3dEditorVizkit::updateMainNode ( osg::Node* node )
      osg::Matrix transform;
      transform.setTrans(p->data.position.x(), p->data.position.y(), p->data.position.z());
      transform.setRotate(osg::Quat(p->data.orientation.x(), p->data.orientation.y(), p->data.orientation.z(), p->data.orientation.w()));
-     osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toLatin1().data());
+     osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toStdString());
      if(!manipulatable){
          std::stringstream ss;
          ss << "No manipulatable with name '" << p->data.sourceFrame << "' was found.";
