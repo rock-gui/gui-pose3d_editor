@@ -16,23 +16,22 @@ Scene::Scene()
 }
 
 std::vector<std::pair<std::string, osg::Matrix> > Scene::get_transforms(){
-    std::vector<std::pair<std::string, osg::Matrix> > ret(_manipulatables.size());
+    std::vector<std::pair<std::string, osg::Matrix> > ret;
 
-    for(uint i=0; i< _manipulatables.size(); i++){
-        ret[i].first = _manipulatables[i].first;
-        ret[i].second = _manipulatables[i].second->get_transform();
-    }
+    std::map<std::string, osg::ref_ptr<Manipulatable> >::iterator it;
+    for(it = _manipulatables.begin(); it != _manipulatables.end(); it++)
+    {
+        ret.push_back(std::make_pair(it->first, it->second->get_transform()));
+    }    
     return ret;
 }
 
 osg::ref_ptr<Manipulatable> Scene::manipulatable(std::string name){
-    for(uint i=0; i< _manipulatables.size(); i++){
-        if(_manipulatables[i].first.compare(name)==0){
-            return _manipulatables[i].second;
-        }
-    }
-    std::cerr << "Did not find '"<<name<<"'"<<std::endl;
-    throw "Not found";
+    std::map<std::string, osg::ref_ptr<Manipulatable> >::iterator it = _manipulatables.find(name);
+    if(it == _manipulatables.end())
+        throw std::runtime_error("Error, no Manipulatable with name " + name + " registered in scene");
+
+    return it->second;
 }
 
 osg::Matrix Scene::get_transform(std::string name){
@@ -42,8 +41,21 @@ osg::Matrix Scene::get_transform(std::string name){
 void Scene::add_movable(std::string name, osg::ref_ptr<osg::Node> scene){
 
     osg::ref_ptr<Manipulatable> ptr = new Manipulatable(scene);
-    _manipulatables.push_back(std::make_pair(name, ptr));
+    if(_manipulatables.count(name))
+        throw std::runtime_error("Error, there is already a manipulatable with name " + name + " registered at the scene");
+    _manipulatables.insert(std::make_pair(name, ptr));
     this->addChild(ptr.get());
+}
+
+void Scene::remove_movable(const std::string &name)
+{
+    std::map<std::string, osg::ref_ptr<Manipulatable> >::iterator it = _manipulatables.find(name);
+    if(it == _manipulatables.end())
+        throw std::runtime_error("Error, no Manipulatable with name " + name + " registered in scene");
+    
+    this->removeChild(it->second.get());
+    
+    _manipulatables.erase(it);
 }
 
 void Scene::add_movable_from_mesh_file(std::string name, std::string filepath, double scale)
