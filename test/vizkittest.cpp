@@ -11,7 +11,9 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
 
     vizkit3d::Pose3dEditorVizkit* widget = new vizkit3d::Pose3dEditorVizkit();
-    widget->scene()->add_movable_from_mesh_file("my_movable", "test_data/AILA_Head.STL", 0.001);
+
+    widget->setFrameName("bla");
+    widget->setModelFile("test_data/AILA_Head.STL");
     widget->setPosition(QVector3D(1,0,0));
 
     app.exec();

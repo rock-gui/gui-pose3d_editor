@@ -46,7 +46,7 @@ void Manipulatable::set_transform(const osg::Matrix& transform){
     else{
         scale = _config.absolute_dragger_size;
     }
-    osg::Matrix mat = osg::Matrix::scale(scale, scale, scale) * osg::Matrix::translate(transform.getTrans());
+    osg::Matrix mat = osg::Matrix::scale(scale, scale, scale) * osg::Matrix::rotate(transform.getRotate()) * osg::Matrix::translate(transform.getTrans()) ;
     _dragger->setMatrix(mat);
 }
 
