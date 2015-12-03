@@ -2,23 +2,13 @@
 #include <osg/io_utils>
 
 namespace modifiable_scene{
-Manipulatable::Manipulatable(osg::ref_ptr<osg::Node> manipulatable_node, const Config& cfg, osg::ref_ptr<osg::Node> attachment)
+Manipulatable::Manipulatable(osg::ref_ptr<osg::Node> manipulatable_node, const Config& cfg)
 {
     _config = cfg;
     _manipulatable_node = manipulatable_node;
     _transform = new osg::MatrixTransform();
 
-    osg::Matrixd mat;
-    if(attachment){
-        mat = getWorldCoords(attachment);
-        mat = osg::Matrixd::identity();
-    }
-    else{
-        mat = osg::Matrixd::identity();
-    }
-
-    osg::Quat q = mat.getRotate();
-    _dragger = new Dragger(mat);
+    _dragger = new Dragger(osg::Matrix::identity());
     _dragger->setupDefaultGeometry();
 
 

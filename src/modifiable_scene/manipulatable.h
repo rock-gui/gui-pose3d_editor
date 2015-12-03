@@ -69,7 +69,7 @@ public:
         float absolute_dragger_size;
     };
 
-    Manipulatable(osg::ref_ptr<osg::Node> manipulatable_node, const Config& cfg=Config(), osg::ref_ptr<osg::Node> attachment=0);
+    Manipulatable(osg::ref_ptr<osg::Node> manipulatable_node, const Config& cfg=Config());
     osg::Matrix get_transform();
 
     void set_transform(const osg::Matrix& transform);

@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Pose3dEditorVizkit.hpp"
 #include <osg/io_utils>
+#include <sstream>
+#include <stdexcept>
 
 using namespace vizkit3d;
 
@@ -10,6 +12,27 @@ struct Pose3dEditorVizkit::Data {
     // Making a copy is required because of how OSG works
     base::samples::RigidBodyState data;
 };
+
+void to_osg(const base::samples::RigidBodyState& a, osg::Matrix& b){
+    b.setTrans(a.position.x(), a.position.y(), a.position.z());
+    b.setRotate(osg::Quat(a.orientation.x(), a.orientation.y(), a.orientation.z(), a.orientation.w()));
+}
+
+void to_osg(const base::Vector3d& a, osg::Vec3d& b){
+    b.set(a.x(), a.y(), a.z());
+}
+
+void to_osg(const base::Quaterniond& a, osg::Quat& b){
+    b.set(a.x(), a.y(), a.z(), a.w());
+}
+
+void to_osg(const QVector3D& a, osg::Vec3d& b){
+    b.set(a.x(), a.y(), a.z());
+}
+
+void to_osg(const QQuaternion& a, osg::Quat& b){
+    b.set(a.x(), a.y(), a.z(), a.scalar());
+}
 
 
 Pose3dEditorVizkit::Pose3dEditorVizkit()
@@ -41,21 +64,38 @@ void Pose3dEditorVizkit::setModelScale(double const scale){
     _modelScale=scale;
 }
 
-QVector3D Pose3dEditorVizkit::position() const {
-    if(_scene->get_transforms().size()){
-        QVector3D ret = to_qt(_scene->get_transforms()[0].second.getTrans());
-        return ret;
+osg::Matrix Pose3dEditorVizkit::get_transform(const std::string &name) const {
+    if(name == ""){
+        if(!_scene->get_transforms().size())
+            return osg::Matrix::identity();
+
+        return _scene->get_transforms()[0].second;
     }
-    else
-        return QVector3D();
+    else{
+        return _scene->get_transform(name);
+    }
 }
 
-base::samples::RigidBodyState Pose3dEditorVizkit::rbs() const {
+void Pose3dEditorVizkit::set_transform(const osg::Matrix& transform, const std::string &name) const {
+    if(name == ""){
+        assert(_scene->get_transforms().size());
+        return _scene->set_transform(_scene->get_transforms()[0].first, transform);
+    }
+    else{
+        return _scene->set_transform(name, transform);
+    }
+}
+
+QVector3D Pose3dEditorVizkit::position(std::string name) const {
+    return to_qt(get_transform(name).getTrans());
+}
+
+base::samples::RigidBodyState Pose3dEditorVizkit::rbs(std::string name) const {
     base::samples::RigidBodyState ret;
 
     if(_scene->get_transforms().size()){
-        QVector3D p=position();
-        QQuaternion q = orientation();
+        QVector3D p=position(name);
+        QQuaternion q = orientation(name);
         ret.position.x() = p.x();
         ret.position.y() = p.y();
         ret.position.z() = p.z();
@@ -64,7 +104,10 @@ base::samples::RigidBodyState Pose3dEditorVizkit::rbs() const {
         ret.orientation.y() = q.y();
         ret.orientation.z() = q.z();
         ret.orientation.w() = q.scalar();
-        ret.sourceFrame = frameName().toLatin1().data();
+        if(name == "")
+            ret.sourceFrame = name;
+        else
+            ret.sourceFrame = frameName().toStdString();
 
         return ret;
     }
@@ -72,70 +115,52 @@ base::samples::RigidBodyState Pose3dEditorVizkit::rbs() const {
         return ret;
 }
 
-void Pose3dEditorVizkit::setRbs(const base::samples::RigidBodyState &rbs){
-    p->data = rbs;
-    updateData(p->data);
+void Pose3dEditorVizkit::setRbs(const base::samples::RigidBodyState &rbs, std::string name){
+    osg::Matrix transform;
+    to_osg(rbs, transform);
+    set_transform(transform, name);
 }
 
-void Pose3dEditorVizkit::setPosition(QVector3D const &vect){
-    p->data.position = to_eigen(vect);
-    updateData(p->data);
+void Pose3dEditorVizkit::setPosition(QVector3D const &vect, std::string name){
+    osg::Matrix transform = get_transform(name);
+    osg::Vec3d pos;
+    to_osg(vect, pos);
+    transform.setTrans(pos);
+    set_transform(transform, name);
 }
 
-QQuaternion Pose3dEditorVizkit::orientation() const {
-    if(_scene->get_transforms().size())
-        return to_qt(_scene->get_transforms()[0].second.getRotate());
-    else
-        return QQuaternion();
+QQuaternion Pose3dEditorVizkit::orientation(std::string name) const {
+    return to_qt(get_transform(name).getRotate());
 }
 
-void Pose3dEditorVizkit::setOrientation(QQuaternion const &quat){
-    p->data.orientation = to_eigen(quat);
-    updateData(p->data);
+void Pose3dEditorVizkit::setOrientation(QQuaternion const &quat, std::string name){
+    osg::Matrix transform = get_transform(name);
+    osg::Quat orient;
+    to_osg(quat, orient);
+    transform.setRotate(orient);
+    set_transform(transform, name);
 }
 
 double Pose3dEditorVizkit::x(){
-    if(_scene->get_transforms().size()){
-        return _scene->get_transforms()[0].second.getTrans().x();
-    }
-    else
-        return 0;
+    return position().x();
 }
 double Pose3dEditorVizkit::y(){
-    if(_scene->get_transforms().size())
-        return _scene->get_transforms()[0].second.getTrans().y();
-    else
-        return 0;
+    return position().y();
 }
 double Pose3dEditorVizkit::z(){
-    if(_scene->get_transforms().size())
-        return _scene->get_transforms()[0].second.getTrans().z();
-    else
-        return 0;
+    return position().z();
 }
 double Pose3dEditorVizkit::qx(){
-    if(_scene->get_transforms().size())
-        return _scene->get_transforms()[0].second.getRotate().x();
-    else
-        return 0;
+    return orientation().x();
 }
 double Pose3dEditorVizkit::qy(){
-    if(_scene->get_transforms().size())
-        return _scene->get_transforms()[0].second.getRotate().y();
-    else
-        return 0;
+    return orientation().y();
 }
 double Pose3dEditorVizkit::qz(){
-    if(_scene->get_transforms().size())
-        return _scene->get_transforms()[0].second.getRotate().z();
-    else
-        return 0;
+    return orientation().z();
 }
 double Pose3dEditorVizkit::qw(){
-    if(_scene->get_transforms().size())
-        return _scene->get_transforms()[0].second.getRotate().w();
-    else
-        return 0;
+    return orientation().scalar();
 }
 void Pose3dEditorVizkit::syncPose(){
     if(_scene->get_transforms().size()){
@@ -145,32 +170,39 @@ void Pose3dEditorVizkit::syncPose(){
 }
 
 void Pose3dEditorVizkit::setX(double const &val){
-    p->data.position.x() = val;
-    updateData(p->data);
+    QVector3D pos = position();
+    pos.setX(val);
+    setPosition(pos);
 }
 void Pose3dEditorVizkit::setY(double const &val){
-     p->data.position.y() = val;
-    updateData(p->data);
+    QVector3D pos = position();
+    pos.setY(val);
+    setPosition(pos);
 }
 void Pose3dEditorVizkit::setZ(double const &val){
-     p->data.position.z() = val;
-    updateData(p->data);
+    QVector3D pos = position();
+    pos.setZ(val);
+    setPosition(pos);
 }
 void Pose3dEditorVizkit::setQx(double const &val){
-     p->data.orientation.x() = val;
-    updateData(p->data);
+    QQuaternion orient = orientation();
+    orient.setX(val);
+    setOrientation(orient);
 }
 void Pose3dEditorVizkit::setQy(double const &val){
-    p->data.orientation.y() = val;
-    updateData(p->data);
+    QQuaternion orient = orientation();
+    orient.setY(val);
+    setOrientation(orient);
 }
 void Pose3dEditorVizkit::setQz(double const &val){
-    p->data.orientation.z() = val;
-    updateData(p->data);
+    QQuaternion orient = orientation();
+    orient.setZ(val);
+    setOrientation(orient);
 }
 void Pose3dEditorVizkit::setQw(double const &val){
-    p->data.orientation.w() = val;
-    updateData(p->data);
+    QQuaternion orient = orientation();
+    orient.setScalar(val);
+    setOrientation(orient);
 }
 
 
@@ -182,7 +214,11 @@ void Pose3dEditorVizkit::setModelFile(QString file_name)
     }
     _modelFile = file_name;
 
-    addMovable(_frameName, _modelFile, _modelScale);
+    if(_scene->size()){
+        _scene->clear();
+    }
+
+    addMovable("", _modelFile, _modelScale);
 }
 
 void Pose3dEditorVizkit::setFrameName(QString frame_name)
@@ -192,19 +228,23 @@ void Pose3dEditorVizkit::setFrameName(QString frame_name)
         throw("a frame name was already set");
     }
     _frameName = frame_name;
-    p->data.sourceFrame = _frameName.toLatin1().data();
-
-    addMovable(_frameName, _modelFile, _modelScale);
+    p->data.sourceFrame = _frameName.toStdString();
 }
 
 
 void Pose3dEditorVizkit::addMovable(QString name, QString model_file, double scale)
 {
     if(_frameName!="" && _modelFile!=""){
-        _scene->add_movable_from_mesh_file(name.toStdString(), model_file.toLatin1().data(), scale);
+        _scene->add_movable_from_mesh_file(name.toStdString(), model_file.toStdString(), scale);
         emit childrenChanged();
     }
 }
+
+void Pose3dEditorVizkit::removeMovable(QString name) 
+{
+    _scene->remove_movable(name.toStdString());
+}
+
 
 osg::ref_ptr<osg::Node> Pose3dEditorVizkit::createMainNode()
 {
@@ -216,24 +256,28 @@ osg::ref_ptr<osg::Node> Pose3dEditorVizkit::createMainNode()
 void Pose3dEditorVizkit::updateMainNode ( osg::Node* node )
 {
     _scene = static_cast< modifiable_scene::Scene*>(node);
+    // Update the main node using the data in p->data
+    /*osg::Matrix transform;
+    to_osg(p->data, transform);
+    osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toStdString());
+
+    manipulatable->set_transform(transform);
+    std::cout << "Update: " << p->data.position.x()<<std::endl;*/
 }
 
 void Pose3dEditorVizkit::updateDataIntern( base::samples::RigidBodyState const& value)
 {
     p->data = value;
 
+    //_scene = static_cast< modifiable_scene::Scene*>(node);
     // Update the main node using the data in p->data
     osg::Matrix transform;
-    transform.setTrans(p->data.position.x(), p->data.position.y(), p->data.position.z());
-    transform.setRotate(osg::Quat(p->data.orientation.x(), p->data.orientation.y(), p->data.orientation.z(), p->data.orientation.w()));
+    to_osg(p->data, transform);
     osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toStdString());
-    if(!manipulatable){
-        std::stringstream ss;
-        ss << "No manipulatable with name '" << p->data.sourceFrame << "' was found.";
-        throw(std::runtime_error(ss.str()));
-    }
+
     manipulatable->set_transform(transform);
     std::cout << "Update: " << p->data.position.x()<<std::endl;
+
     emit childrenChanged();
 }
 
