@@ -18,6 +18,7 @@ public:
 
     std::vector<std::pair<std::string, osg::Matrix> > get_transforms();
     osg::Matrix get_transform(std::string name);
+    void set_transform(std::string name, osg::Matrix transform);
     void add_movable(std::string name, osg::ref_ptr<osg::Node> scene);
     void add_movable_from_mesh_file(std::string name, std::string filepath, double scale=1.f);
     void remove_movable(const std::string &name);

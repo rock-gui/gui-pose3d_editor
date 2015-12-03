@@ -39,6 +39,10 @@ osg::Matrix Scene::get_transform(std::string name){
     return manipulatable(name)->get_transform();
 }
 
+void Scene::set_transform(std::string name, osg::Matrix transform){
+    return manipulatable(name)->set_transform(transform);
+}
+
 void Scene::add_movable(std::string name, osg::ref_ptr<osg::Node> scene){
 
     osg::ref_ptr<Manipulatable> ptr = new Manipulatable(scene);

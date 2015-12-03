@@ -21,12 +21,33 @@ class Pose3dEditorVizkit
     Q_PROPERTY(QString modelFile READ modelFile WRITE setModelFile)
     Q_PROPERTY(QString frameName READ frameName WRITE setFrameName)
     Q_PROPERTY(double modelScale READ modelScale WRITE setModelScale)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double x READ x WRITE setX)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double y READ y WRITE setY)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double z READ z WRITE setZ)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double qx READ qx WRITE setQx)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double qy READ qy WRITE setQy)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double qz READ qz WRITE setQz)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double qw READ qw WRITE setQw)
 
 public:
@@ -41,31 +62,73 @@ public:
     void setModelScale(double const scale);
     double modelScale() const{return _modelScale;}
 
+    /**
+     * @deprecated
+     */
     double x();
+    /**
+     * @deprecated
+     */
     double y();
+    /**
+     * @deprecated
+     */
     double z();
+    /**
+     * @deprecated
+     */
     double qx();
+    /**
+     * @deprecated
+     */
     double qy();
+    /**
+     * @deprecated
+     */
     double qz();
+    /**
+     * @deprecated
+     */
     double qw();
+    /**
+     * @deprecated
+     */
     void setX(double const &val);
+    /**
+     * @deprecated
+     */
     void setY(double const &val);
+    /**
+     * @deprecated
+     */
     void setZ(double const &val);
+    /**
+     * @deprecated
+     */
     void setQx(double const &val);
+    /**
+     * @deprecated
+     */
     void setQy(double const &val);
+    /**
+     * @deprecated
+     */
     void setQz(double const &val);
+    /**
+     * @deprecated
+     */
     void setQw(double const &val);
 
 public slots:
     void syncPose();
 
 
-    QVector3D position() const;
-    void setPosition(QVector3D const &vect);
-    QQuaternion orientation() const;
-    void setOrientation(QQuaternion const &quat);
-    base::samples::RigidBodyState rbs() const;
-    void setRbs(base::samples::RigidBodyState const &rbs);
+    QVector3D position(std::string name="") const;
+    void setPosition(QVector3D const &vect, std::string name="");
+    QQuaternion orientation(std::string name="") const;
+    void setOrientation(QQuaternion const &quat, std::string name="");
+    base::samples::RigidBodyState rbs(std::string name="") const;
+    void setRbs(base::samples::RigidBodyState const &rbs, std::string name="");
 
 
 
@@ -103,6 +166,11 @@ protected:
     inline Eigen::Quaterniond to_eigen(QQuaternion const quat) const {
         return Eigen::Quaterniond(quat.scalar(), quat.x(), quat.y(), quat.z());
     }
+
+    //If no name is given automatically first transform is returned. This is for backwards compatibility and deprecated
+    osg::Matrix get_transform(const std::string& name) const;
+    //If no name is given automatically first transform is set. This is for backwards compatibility and deprecated
+    void set_transform(const osg::Matrix& transform, const std::string &name) const;
 
 private:
     struct Data;

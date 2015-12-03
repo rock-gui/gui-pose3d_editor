@@ -3,7 +3,7 @@
 #ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 #add_executable(plugintest plugintest.cpp)
-#target_link_libraries(plugintest Pose3dEditor)
+#target_link_libraries(plugintest pose3d_editor)
 
 #find_package(PkgConfig)
 #pkg_check_modules(EIGEN eigen3)
@@ -12,5 +12,5 @@
 #include_directories(${EIGEN_INCLUDE_DIRS} ${vizkit3d_INCLUDE_DIRS})
 
 #add_executable(vizkitest vizkittest.cpp)
-#target_link_libraries(vizkitest pose3d_editor-viz Pose3dEditor modifiable_scene ${vizkit3d_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}
+#target_link_libraries(vizkitest pose3d_editor-viz modifiable_scene ${vizkit3d_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}
 #  ${Boost_SYSTEM_LIBRARY})
