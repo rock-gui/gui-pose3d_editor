@@ -2,6 +2,7 @@
 #include <osg/ShapeDrawable>
 #include <osg/PositionAttitudeTransform>
 #include <iostream>
+#include <stdexcept>
 
 
 namespace modifiable_scene{
