@@ -18,8 +18,17 @@ class Pose3dEditorVizkit
           , boost::noncopyable
 {
     Q_OBJECT
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(QString modelFile READ modelFile WRITE setModelFile)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(QString frameName READ frameName WRITE setFrameName)
+    /**
+     * @deprecated
+     */
     Q_PROPERTY(double modelScale READ modelScale WRITE setModelScale)
     /**
      * @deprecated
@@ -55,11 +64,29 @@ public:
     Pose3dEditorVizkit();
     ~Pose3dEditorVizkit();
 
+    /**
+     * @deprecated
+     */
     void setModelFile(QString const name);
+    /**
+     * @deprecated
+     */
     QString modelFile() const;
+    /**
+     * @deprecated
+     */
     void setFrameName(QString const name);
+    /**
+     * @deprecated
+     */
     QString frameName() const;
+    /**
+     * @deprecated
+     */
     void setModelScale(double const scale);
+    /**
+     * @deprecated
+     */
     double modelScale() const{return _modelScale;}
 
     /**

@@ -14,3 +14,4 @@
 #add_executable(vizkitest vizkittest.cpp)
 #target_link_libraries(vizkitest pose3d_editor-viz modifiable_scene ${vizkit3d_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}
 #  ${Boost_SYSTEM_LIBRARY})
+

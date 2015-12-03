@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 FIND_PACKAGE(OpenSceneGraph REQUIRED osgManipulator osgViewer osgDB osgUtil osgGA osgText)
 find_package(PkgConfig)

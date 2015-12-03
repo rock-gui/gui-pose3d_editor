@@ -3,18 +3,20 @@
 
 #include <osgManipulator/Dragger>
 #include <osgManipulator/TrackballDragger>
-#include <osgManipulator/Translate2DDragger>
+#include <osgManipulator/Translate1DDragger>
+
 
 namespace modifiable_scene{
 
-class DualPlaneDragger: public osgManipulator::CompositeDragger
+class TripleLineDragger: public osgManipulator::CompositeDragger
 {
     public:
-        osg::ref_ptr<osgManipulator::Translate2DDragger> _plane_dragger1;
-        osg::ref_ptr<osgManipulator::Translate2DDragger> _plane_dragger2;
+        osg::ref_ptr<osgManipulator::Translate1DDragger> _line_dragger1;
+        osg::ref_ptr<osgManipulator::Translate1DDragger> _line_dragger2;
+        osg::ref_ptr<osgManipulator::Translate1DDragger> _line_dragger3;
 
-        DualPlaneDragger();
-        ~DualPlaneDragger();
+        TripleLineDragger(osg::Matrixd world_coords);
+        ~TripleLineDragger();
 
         void setupDefaultGeometry();
         void setColor(const osg::Vec4& color);
@@ -31,8 +33,8 @@ class Dragger : public osgManipulator::CompositeDragger
 {
 public:
     osg::ref_ptr<TrackballDragger> _orientation_dragger;
-    osg::ref_ptr<DualPlaneDragger> _position_dragger;
-    Dragger();
+    osg::ref_ptr<TripleLineDragger> _position_dragger;
+    Dragger(osg::Matrixd world_coords);
 
     ~Dragger();
 

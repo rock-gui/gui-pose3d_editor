@@ -66,7 +66,9 @@ void Pose3dEditorVizkit::setModelScale(double const scale){
 
 osg::Matrix Pose3dEditorVizkit::get_transform(const std::string &name) const {
     if(name == ""){
-        assert(_scene->get_transforms().size());
+        if(!_scene->get_transforms().size())
+            return osg::Matrix::identity();
+
         return _scene->get_transforms()[0].second;
     }
     else{
@@ -102,7 +104,10 @@ base::samples::RigidBodyState Pose3dEditorVizkit::rbs(std::string name) const {
         ret.orientation.y() = q.y();
         ret.orientation.z() = q.z();
         ret.orientation.w() = q.scalar();
-        ret.sourceFrame = name;
+        if(name == "")
+            ret.sourceFrame = name;
+        else
+            ret.sourceFrame = frameName().toStdString();
 
         return ret;
     }
@@ -125,7 +130,7 @@ void Pose3dEditorVizkit::setPosition(QVector3D const &vect, std::string name){
 }
 
 QQuaternion Pose3dEditorVizkit::orientation(std::string name) const {
-    get_transform(name).getRotate();
+    return to_qt(get_transform(name).getRotate());
 }
 
 void Pose3dEditorVizkit::setOrientation(QQuaternion const &quat, std::string name){
@@ -209,7 +214,11 @@ void Pose3dEditorVizkit::setModelFile(QString file_name)
     }
     _modelFile = file_name;
 
-    addMovable(_frameName, _modelFile, _modelScale);
+    if(_scene->size()){
+        _scene->clear();
+    }
+
+    addMovable("", _modelFile, _modelScale);
 }
 
 void Pose3dEditorVizkit::setFrameName(QString frame_name)
@@ -220,18 +229,14 @@ void Pose3dEditorVizkit::setFrameName(QString frame_name)
     }
     _frameName = frame_name;
     p->data.sourceFrame = _frameName.toStdString();
-
-    addMovable(_frameName, _modelFile, _modelScale);
 }
 
 
 void Pose3dEditorVizkit::addMovable(QString name, QString model_file, double scale)
 {
     if(_frameName!="" && _modelFile!=""){
-        std::cout << "adding " << name.toStdString() <<std::endl;
         _scene->add_movable_from_mesh_file(name.toStdString(), model_file.toStdString(), scale);
         emit childrenChanged();
-        std::cout << "added"<<std::endl;
     }
 }
 
@@ -250,20 +255,29 @@ osg::ref_ptr<osg::Node> Pose3dEditorVizkit::createMainNode()
 
 void Pose3dEditorVizkit::updateMainNode ( osg::Node* node )
 {
-     _scene = static_cast< modifiable_scene::Scene*>(node);
+    _scene = static_cast< modifiable_scene::Scene*>(node);
     // Update the main node using the data in p->data
-     osg::Matrix transform;
-     to_osg(p->data, transform);
-     osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toStdString());
+    /*osg::Matrix transform;
+    to_osg(p->data, transform);
+    osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toStdString());
 
-     manipulatable->set_transform(transform);
-     std::cout << "Update: " << p->data.position.x()<<std::endl;
+    manipulatable->set_transform(transform);
+    std::cout << "Update: " << p->data.position.x()<<std::endl;*/
 }
 
 void Pose3dEditorVizkit::updateDataIntern( base::samples::RigidBodyState const& value)
 {
     p->data = value;
-    std::cout << "Update intern: " << p->data.position.x()<<","<<value.position.x()<<std::endl;
+
+    //_scene = static_cast< modifiable_scene::Scene*>(node);
+    // Update the main node using the data in p->data
+    osg::Matrix transform;
+    to_osg(p->data, transform);
+    osg::ref_ptr<modifiable_scene::Manipulatable> manipulatable = _scene->manipulatable(_frameName.toStdString());
+
+    manipulatable->set_transform(transform);
+    std::cout << "Update: " << p->data.position.x()<<std::endl;
+
     emit childrenChanged();
 }
 

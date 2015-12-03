@@ -14,9 +14,10 @@ int main(int argc, char** argv)
     vizkit3d::Vizkit3DWidget* widget = new vizkit3d::Vizkit3DWidget();
     widget->show();
 
-
     //vizkit3d::Vizkit3DWidget will destroy this gui internally
     vizkit3d::Pose3dEditorVizkit* plugin =  new vizkit3d::Pose3dEditorVizkit();
+    widget->addPlugin(plugin);
+
     plugin->scene()->add_movable_from_mesh_file("my_movable", "../../test/test_data/AILA_Head.STL", 0.001);
     plugin->setPosition(QVector3D(1,0,0));
 
@@ -29,7 +30,6 @@ int main(int argc, char** argv)
     plugin->scene()->add_movable_from_mesh_file("my_movable3", "../../test/test_data/AILA_Head.STL", 0.001);
     plugin->setOrientation(QQuaternion(-1,1,0,0), "my_movable3");
 
-    widget->addPlugin(plugin);
     app.exec();
 
     return 0;
