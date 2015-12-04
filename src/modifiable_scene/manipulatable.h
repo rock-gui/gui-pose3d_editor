@@ -4,6 +4,8 @@
 #include "sceneitem.h"
 #include "dragger.h"
 
+#define DRAGGER_MASK 0x00000010
+
 namespace modifiable_scene{
 // Visitor to return the world coordinates of a node.
 // It traverses from the starting node to the parent.

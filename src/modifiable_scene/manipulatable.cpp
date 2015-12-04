@@ -10,7 +10,7 @@ Manipulatable::Manipulatable(osg::ref_ptr<osg::Node> manipulatable_node, const C
 
     _dragger = new Dragger(osg::Matrix::identity());
     _dragger->setupDefaultGeometry();
-
+    _dragger->setNodeMask(DRAGGER_MASK);
 
     manipulatable_node->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
     _transform->addChild(_manipulatable_node);
