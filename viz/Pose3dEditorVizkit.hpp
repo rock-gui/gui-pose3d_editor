@@ -156,6 +156,10 @@ public slots:
     void setOrientation(QQuaternion const &quat, std::string name="");
     base::samples::RigidBodyState rbs(std::string name="") const;
     void setRbs(base::samples::RigidBodyState const &rbs, std::string name="");
+    //If no name is given automatically first transform is returned. This is for backwards compatibility and deprecated
+    osg::Matrix get_transform(const std::string& name) const;
+    //If no name is given automatically first transform is set. This is for backwards compatibility and deprecated
+    void set_transform(const osg::Matrix& transform, const std::string &name) const;
 
 
 
@@ -193,11 +197,6 @@ protected:
     inline Eigen::Quaterniond to_eigen(QQuaternion const quat) const {
         return Eigen::Quaterniond(quat.scalar(), quat.x(), quat.y(), quat.z());
     }
-
-    //If no name is given automatically first transform is returned. This is for backwards compatibility and deprecated
-    osg::Matrix get_transform(const std::string& name) const;
-    //If no name is given automatically first transform is set. This is for backwards compatibility and deprecated
-    void set_transform(const osg::Matrix& transform, const std::string &name) const;
 
 private:
     struct Data;
