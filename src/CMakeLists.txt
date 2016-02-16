@@ -5,10 +5,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 SET(MOC_HDRS
     Pose3dEditor.hpp
     Pose3dEditorPlugin.hpp
+    DraggerPoseUpdateQt.hpp
 )
 
 SET(HDRS
     Pose3dEditor.hpp
+    DraggerPoseUpdateQt.hpp
 )
 
 FILE(GLOB SRCS
@@ -22,7 +24,7 @@ FILE(GLOB UI_FILES
 SET(QtApp_RCCS resources.qrc)
 
 rock_vizkit_widget(pose3d_editor
-    SOURCES ${SRCS} ${QtApp_RCC_SRCS}
+    SOURCES ${SRCS} ${QtApp_RCC_SRCS} ${HDRS}
     HEADERS ${HDRS}
     MOC ${MOC_HDRS}
     DEPS_PKGCONFIG QtCore QtGui QtOpenGL
